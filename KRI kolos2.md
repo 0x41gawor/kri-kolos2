@@ -15,7 +15,7 @@ Rozszerzenia:
 
 ## Switching vs routing
 
-![image-20230605183017061](img\image-20230605183017061.png)
+<img src="img\image-20230605183017061.png" alt="image-20230605183017061" style="zoom:80%;" />
 
 Kluczowe jest tu to, że router jak dostanie pakiet to podmienia nagłówek L2 (np. ETH), no bo fizycznie ten pakiet, będzie miał już inną destynacje. Switch z kolei to taki smart skrzyżowanie kabli. On nie modyfikuje pakietu, tylko odczytuje do którego urządzenia to ma iść.
 
