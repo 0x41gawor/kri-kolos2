@@ -211,6 +211,158 @@ DiffServ TE - DiffServ Aware Traffic Engineering.
 
 Odpowiedz na te pytania ze zrozumieniem.
 
+# BGP
+
+## Intro
+
+BGP jest protokołem typu Distance Path Vector.
+
+> With distance vector routes are advertised based upon the following **characteristics**:
+>
+> - **Distance** - How far the destination network is based upon a metric such as hop count.
+> - **Vector** - The direction (next-hop router) required to get to the destination.
+>
+> This routing information is **exchanged between directly connected neighbours**. Therefore when a node receives a routing update, it has no knowledge of where the neighbour learned it from. In other words, the **node has no visibility of the network past its own neighbour**.
+
+> In **Link State routing**  each node is advertising/**flooding** the **state** of their **links** to every node within the link state domain. This results in each node building a complete map of the network (**shortest path tree**), with itself as the root using the shortest path first algorithm, also known as the Dijkstra algorithm.
+
+![image-20230614215225521](img\image-20230614215225521.png)
+
+![image-20230614215428528](img\image-20230614215428528.png)
+
+## Sesje i-BGP
+
+BGP speaker dostanie ścieżke od jakiegoś sąsiada z innego AS w sesji e-BGP. To więc, żeby inne rutery też umiały trafić do tego prefixu musi on rozesłać to do każdego rutera w swoim AS (dlatego potrzebujemy **full mesh** w sesjach i-BGP). To jest podstawowa funkcja!
+
+<img src="img\image-20230614215940754.png" alt="image-20230614215940754" style="zoom:67%;" />
+
+Dodatkowo zauważ, że jak jakiś ruter na drugim końcu AS dostanie to rozgłoszenie, to on też z kimś jest w sesji e-BGP i podzieli się  tą ścieżką z innym AS. Dlatego drugą funkcja jest:
+
+![image-20230614220030586](img\image-20230614220030586.png)
+
+## Split Horizon
+
+![image-20230614221840539](img\image-20230614221840539.png)
+
+
+
+Spójrzmy na przykład Router A dostał od innego AS lub swojej sieci lokalnej jakiś prefix. Rozgłasza go więc do swoich BGP neighbor czyli B i F. Oni rozgłaszają na wszystkie inne interfejsy, ale nie te skąd dostały. Rozważmy naprzykład router E. On w t=3 dostał od B i E prefix, rozgłosi go więc tylko na interfejs do D. D z kolei nigdzie nie rozgłosi, bo dostał już ten prefix na każdym swoim interfejsie.
+
+## BGP free core
+
+![image-20230614224914335](img\image-20230614224914335.png)
+
+Dzięki temu w Core nie potrzeba sesji i-BGP hop-by-hop każdy router a tylko routery brzegowe.
+
+## Wiadomości i bazy danych
+
+![image-20230614225852961](img\image-20230614225852961.png)
+
+
+
+Najważniejsza dla nas jest wiadomość UPDATE. Przypominka, że jak Distance Path Vector wysyła ścieżkę, to podaje Distance i Vector. W BGP ścieżka jest identyfikowana jako **NLRI (prefix)**, Vector to atrybut **next-hop** (jeden z BGPAttributes) a Distance to reszta **BGP Attributes**. 
+
+## BGP Attributes
+
+![image-20230614230038010](img\image-20230614230038010.png)
+
+![image-20230614230246312](img\image-20230614230246312.png)
+
+### well-known mandatory
+
+#### AS PATH
+
+<img src="img\image-20230614230320571.png" alt="image-20230614230320571" style="zoom:67%;" />
+
+**Path Prepending**
+
+<img src="img\image-20230614230432544.png" alt="image-20230614230432544" style="zoom:50%;" />
+
+Czyli sterujemy ruchem wchodzącym, rozgłaszamy nasz prefix, ale dla różnych ścieżek dajemy różną liczbę naszego ASN w AS PATH
+
+**Path poisoning** - warto tu wspomnieć o takiej sztuczce, że jak dopiszemy do AS-Path ASN jakiegoś AS'a  (np. teściowej), to routery z tego AS'a będą odrzucać to rozgłoszenie (ze względu na mechanizm, które nienawidzą pętle routingowe).
+
+**Agregacja adresów i AS_PATH**
+
+<img src="img\image-20230614231647730.png" alt="image-20230614231647730" style="zoom:50%;" />
+
+#### Next-hop
+
+<img src="img\image-20230614230656303.png" alt="image-20230614230656303" style="zoom:57%;" />
+
+#### Origin
+
+Info o tym skąd pochodzi prefix.
+
+- IGP - pochodzi z sieci lokalnej do której router jest podłączon
+- EGP - pochodzi on innego AS
+- Incomplete - inne przypadki niebezpośrednich metod rozłaszania prefixów za pośrednictwem BGP -> 
+
+### well-known discretionary
+
+#### local preference
+
+<img src="img\image-20230614231254178.png" alt="image-20230614231254178" style="zoom:50%;" />
+
+Czyli jak router C dostanie dwa rozgłoszenia tego samego prefixu to wybierze next-hop ten router, który przy rozgłoszeniu dał WIĘKSZY local-preference.
+
+Jest to narzędzie do ruchu wychodzącego
+
+### optional non-transitive
+
+#### MED
+
+<img src="img\image-20230614231540386.png" alt="image-20230614231540386" style="zoom:50%;" />
+
+Parametr MED sugeruje  sąsiedniemu AS'owi, którym naszym routerem ma wchodzić do nas ruch o danym prefixie. (ofc. bez wcześniejszych ustaleń biznesowych zostanie to zignorowane).
+
+Jest to inżynieria ruchu wchodzącego
+
+## Narzędzia do Inbound i Outbound Traffic
+
+Outbound Traffic:
+
+- Local Preference
+
+Inbound Traffic:
+
+- MED
+- Path Prepending
+
+Outbound traffic jest mega prosty do wysterowania, bo to my nim sterujemy, więc tu wystarczu local preference i elo.
+
+Ruch wchodzący Tutaj już jest trudno, musimy skłonić świat, aby działał wg. naszego widzimisie. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # VPRN
 
 Virtual Private Routed Network to coś innego niż VPN. 
