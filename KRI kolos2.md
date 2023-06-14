@@ -333,35 +333,49 @@ Outbound traffic jest mega prosty do wysterowania, bo to my nim sterujemy, więc
 
 Ruch wchodzący Tutaj już jest trudno, musimy skłonić świat, aby działał wg. naszego widzimisie. 
 
+## Redukcja sesji i-BGP
+
+![image-20230614234559290](img\image-20230614234559290.png)
+
+### BGP Confederations
+
+<img src="img\image-20230614235131394.png" alt="image-20230614235131394" style="zoom:67%;" />
 
 
 
+Wydzielenie sub-ASów w ASie.
+
+### Route Reflector
+
+<img src="img\image-20230614235324229.png" alt="image-20230614235324229" style="zoom:50%;" />
 
 
 
+<img src="img\image-20230614235435963.png" alt="image-20230614235435963" style="zoom:50%;" />
 
 
 
+<img src="img\image-20230614235555190.png" alt="image-20230614235555190" style="zoom: 50%;" />
 
 
 
+## BGP Community
 
+BGP Community jest to atrybut optional transitive. 
 
+Jest to 32 bitowy tag, który wykorzystywany jest przez ISP do tworzenia reguł rutingu.
 
+<img src="img\image-20230615005238445.png" alt="image-20230615005238445" style="zoom: 67%;" />
 
+Więc ISP sobie sam wymyśla je, ale mamy:
 
+<img src="img\image-20230615005421331.png" alt="image-20230615005421331" style="zoom:67%;" />
 
+![image-20230615005448014](img\image-20230615005448014.png)
 
+## BGP Capabilities
 
-
-
-
-
-
-
-
-
-
+<img src="img\image-20230615005513635.png" alt="image-20230615005513635" style="zoom:50%;" />
 
 # VPRN
 
