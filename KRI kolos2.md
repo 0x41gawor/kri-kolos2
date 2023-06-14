@@ -177,9 +177,7 @@ ero - **explicit** route object - The ERO is a list of LSRs – specified by IP 
 
 Secondary LSP to info o PATH ERROR musi dotrzeć aż do source, czyli LER. A w Fast Reroute już pierwszy LSR na któym sie zepsuje link podejmuje akcje.
 
-## Point-to-Multipoint
-
-![image-20230605185525609](img\image-20230605185525609.png)
+## Point-to-Multipoint![image-20230605185525609](img\image-20230605185525609.png)
 
 ![image-20230605185532943](img\image-20230605185532943.png)
 
@@ -226,9 +224,9 @@ BGP jest protokołem typu Distance Path Vector.
 
 > In **Link State routing**  each node is advertising/**flooding** the **state** of their **links** to every node within the link state domain. This results in each node building a complete map of the network (**shortest path tree**), with itself as the root using the shortest path first algorithm, also known as the Dijkstra algorithm.
 
-![image-20230614215225521](img\image-20230614215225521.png)
+<img src="img\image-20230614215225521.png" alt="image-20230614215225521" style="zoom:50%;" />
 
-![image-20230614215428528](img\image-20230614215428528.png)
+<img src="img\image-20230614215428528.png" alt="image-20230614215428528" style="zoom:67%;" />
 
 ## Sesje i-BGP
 
@@ -246,7 +244,7 @@ Dodatkowo zauważ, że jak jakiś ruter na drugim końcu AS dostanie to rozgłos
 
 
 
-Spójrzmy na przykład Router A dostał od innego AS lub swojej sieci lokalnej jakiś prefix. Rozgłasza go więc do swoich BGP neighbor czyli B i F. Oni rozgłaszają na wszystkie inne interfejsy, ale nie te skąd dostały. Rozważmy naprzykład router E. On w t=3 dostał od B i E prefix, rozgłosi go więc tylko na interfejs do D. D z kolei nigdzie nie rozgłosi, bo dostał już ten prefix na każdym swoim interfejsie.
+Spójrzmy na przykład Router A dostał od innego AS lub swojej sieci lokalnej jakiś prefix. Rozgłasza go więc do swoich BGP neighbor czyli B i F. Oni rozgłaszają na wszystkie inne interfejsy, ale nie te skąd dostały. Rozważmy naprzykład router E. On w t=3 dostał od B i F prefix, rozgłosi go więc tylko na interfejs do D. D z kolei nigdzie nie rozgłosi, bo dostał już ten prefix na każdym swoim interfejsie.
 
 ## BGP free core
 
@@ -314,7 +312,7 @@ Jest to narzędzie do ruchu wychodzącego
 
 <img src="img\image-20230614231540386.png" alt="image-20230614231540386" style="zoom:50%;" />
 
-Parametr MED sugeruje  sąsiedniemu AS'owi, którym naszym routerem ma wchodzić do nas ruch o danym prefixie. (ofc. bez wcześniejszych ustaleń biznesowych zostanie to zignorowane).
+Parametr MED sugeruje sąsiedniemu AS'owi, którym naszym routerem ma wchodzić do nas ruch o danym prefixie. (ofc. bez wcześniejszych ustaleń biznesowych zostanie to zignorowane).
 
 Jest to inżynieria ruchu wchodzącego
 
@@ -329,7 +327,7 @@ Inbound Traffic:
 - MED
 - Path Prepending
 
-Outbound traffic jest mega prosty do wysterowania, bo to my nim sterujemy, więc tu wystarczu local preference i elo.
+Outbound traffic jest mega prosty do wysterowania, bo to my nim sterujemy, więc tu wystarczy local preference i elo.
 
 Ruch wchodzący Tutaj już jest trudno, musimy skłonić świat, aby działał wg. naszego widzimisie. 
 
@@ -352,6 +350,8 @@ Wydzielenie sub-ASów w ASie.
 
 
 <img src="img\image-20230614235435963.png" alt="image-20230614235435963" style="zoom:50%;" />
+
+Otrzymując ścieżke od non-client rozgłsza ją do swoich clients (bo nimi się opiekuje) do eBGP, ale nie do non-client, bo nim opiekuje sie jakis inny RR
 
 
 
@@ -724,7 +724,7 @@ Rozszerzony leaf-spine
 
 Oparta całkowicie na L3.
 
-Tutaj już te sieci są naprawdę wielkie, to też czasem IGP staje się nieefektywne i **wykorzystuje się BGP**.
+Tutaj już te sieci są naprawdę wielkie, to też czasem IGP staje się nieefektywne i **wykorzystuje się BGP** (bo BGP jest skalowalny)
 
 Dodatkowo IP fabric też:
 
