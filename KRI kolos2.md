@@ -88,6 +88,8 @@ Wymaga:
 
 ![image-20230605183951438](img\image-20230605183951438.png)
 
+//TODO obczaj ocb z tym Downstream Unsolicited, Downstream on Demand
+
 LDP:
 
 - automatycznie tworzy tuenel w oparciu o FEC.
@@ -288,11 +290,11 @@ Routery PE są ze sobą w sesji iBGP, żeby wiedziały o prefiksach rozgłaszany
 
 ## MultiProtocol BGP (MP-BGP)
 
-Pamiętaj też, że wszystkie router P i PE są w jakieś sesji routingu IGP np. OSPF.
+Pamiętaj też, że wszystkie routery P i PE są w jakieś sesji routingu IGP np. OSPF.
 
 <img src="img/igp.png" style="zoom:50%;" />
 
-No dobra, ale jak teraz zrobić, że jak np. CE::B3 rozgłosi swoją podsieć to żeby PE4 rozgłosiło to tylko do tych PE które mają VRF niebieski.
+No dobra, ale jak teraz zrobić, że jak np. CE::B4 rozgłosi swoją podsieć to żeby PE4 rozgłosiło to tylko do tych PE które mają VRF niebieski.
 
 ### Route Target
 
@@ -338,7 +340,7 @@ adres VPNv4 = RD + adres IP
 
 Jako RD często daje się numer AS ISPi jakiś nr sekwencyjny, który definiuje pojedynczy site klienta
 
-No i teraz jak sieć klienta w e-BGP rozgłosi jakąś sieć, to to w rzuterze PE trafi do VRF tego klienta (po jakim id to ja nie wiem, chyba na podstawie tego, że dany neighbor ma być obsługiwany przez dany VRF), który dalej (co MPLS core) rozgłosi ten adres, ale doczepi do niego RD na początek.
+No i teraz jak sieć klienta w e-BGP rozgłosi jakąś sieć, to to w rzuterze PE trafi do VRF tego klienta (po jakim id to ja nie wiem, chyba na podstawie tego, że dany neighbor ma być obsługiwany przez dany VRF), który dalej (do MPLS core) rozgłosi ten adres, ale doczepi do niego RD na początek.
 
 Przykładowo AS 10 jest klientem routera PE2, który jest w AS 6000. To wtedy w VRF tego klienta (powiedzmy ze jest to VRF green) zapiszemy, że RD=`6000:10`, gdyż taka jest konwencja. Nasz AS a potem jakieś id sieć klienta.
 
@@ -348,7 +350,7 @@ PE2 > config router vrf green
 PE2/conf/vrf/green> RD 6000:10
 ```
 
-No i teraz jak AS 10 w sesji e-BGP do routera PE-2 rozgłosi ścieżkę np. `10.0.0.2/24` to on rozgłosi ją w MPLS Core jako `6000:10::10.0.0.2/24`
+No i teraz jak AS 10 w sesji e-BGP do routera PE-2 rozgłosi prefix np. `10.0.0.2/24` to on rozgłosi go w MPLS Core jako `6000:10::10.0.0.2/24`
 
 ##### RT
 
@@ -519,7 +521,7 @@ Ta architektura jest **zoptymalizowana dla ruchu N-S** (North-South). Kiedyś w 
 
 **Aggregation Layer**, to warstwa która agreguje ruch ze switchy, **jest granicą między L2, a L3**.
 
-Separacja aplikacji w warstwie **edge** jest robiona poprze VLAN.
+Separacja aplikacji w warstwie **edge** jest robiona poprzez VLAN.
 
 > VLAN - any broadcast domain that is partitioned and isolated in a computer network at the data link layer (OSI layer 2), czyli jest to mechanizm protokołu ETH.
 
@@ -567,7 +569,7 @@ Dodatkowo IP fabric też:
 
 VPRN to było tak, że łączyliśmy kilka site'ów klienta i oni wysyłali do siebie ruch IP. Teraz opowiemy o tym jak site'y klienta mogą się wymieniać ruchem Ethernet.
 
-Any **Transport Over MPLS (AToM)** *transports layer 2 frames like Ethernet or Frame-Relay over the MPLS Backbone*.
+**Any** **Transport Over MPLS (AToM)** *transports layer 2 frames like Ethernet or Frame-Relay over the MPLS Backbone*.
 
 AToM jest uznawany za usgłuę point-to-point typu VPWS (Virtual Private Wire Service) lub inaczej tzw. PW (Private Wire). Obie te nazwą mówią o tym, że klient od ISP dostaje swój prywatny wire (kabel), ale ISP robi go virtual bo tak naprawdę jest oparty na MPLS backbone.
 
@@ -587,7 +589,7 @@ Terminologia architektury:
 
 ## AToM
 
-No i to jest tak, ze jak przchodzi klient i mówi, że chce mieć PW między CE_greer_1 a CE_green_2. To operator ISP konfiguruje mu ten ten PW o tak, że:
+No i to jest tak, ze jak przchodzi klient i mówi, że chce mieć PW między CE_green_1 a CE_green_2. To operator ISP konfiguruje mu ten ten PW o tak, że:
 
 - na routerach PE robią powiązanie `VC <-> AC` czyli wiąże Virtual Circuit (to jest PW klienta w MPLS core) z Access Circuit - łączem z klientem którego jest to PW
 
@@ -609,7 +611,7 @@ No dobra, co klient daje jako ten Layer-2 PDU? Otóż ramki ETH, teraz trochę o
 
 ## QinQ
 
-No dobra jak klient wsadza do nas pakiety ETH, to bardzo możliwe, że ma on porobione w tej swojej dużej sieci ETHERNAT LAN porobione VLANy ETH. 
+No dobra, jak klient wsadza do nas pakiety ETH, to bardzo możliwe, że ma on porobione w tej swojej dużej sieci ETHERNeT LAN porobione VLANy ETH. 
 
 Mechanizm VLAN ETH polega na tym, że ramka ETH ma dodatkowe pole określające do którego VLAN należy. 
 
@@ -692,7 +694,7 @@ Stan początkowy jest taki.
 
 Switch A pełniący tu rolę VTEP ma skonfigurowane, że host A należy do VxLAN o VNID równym 10. To samo ma powiedziane switch B.
 
-Też już jesteśmy po procesie odpytywania ARP itd. Switche również w swoich MAC Address Table mają już wypełnione.
+Też już jesteśmy po procesie odpytywania ARP itd. Switche swoje MAC Address Table mają już wypełnione.
 
 <img src="img/vxlan1.png" style="zoom:65%;" />
 
@@ -712,7 +714,7 @@ VTEP robi enkapsulacje tej ramki ETH i wysyła ją do IP Core.
 
 Ta VxLAN frame, w końcu trafia do switcha VTEP (to on ma logikę VxLAN, więc to on dopiero moze to zdekapsulować). 
 
-VTEP B odbiera ramkę VxLAN, patrzy że jest dst_ip, więc dekapsuluje ją. 
+VTEP B odbiera ramkę VxLAN, patrzy że on sam jest dst_ip, więc dekapsuluje ją. 
 
 <img src="img/vxlan5.png" style="zoom:67%;" />
 
@@ -748,7 +750,7 @@ Czyli switch najpierw zalał sieć pakietami ARP, ale dzięki temu się nauczył
 
 #### Przykład
 
-Nikt jeszcze w siecie nie zna nic. 
+Nikt jeszcze w sieci nie zna nic. 
 
 <img src="img\image-20230614010205267.png" alt="image-20230614010205267" style="zoom:67%;" />
 
