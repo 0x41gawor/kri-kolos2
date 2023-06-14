@@ -294,7 +294,7 @@ Pamiętaj też, że wszystkie routery P i PE są w jakieś sesji routingu IGP np
 
 <img src="img/igp.png" style="zoom:50%;" />
 
-No dobra, ale jak teraz zrobić, że jak np. CE::B4 rozgłosi swoją podsieć to żeby PE4 rozgłosiło to tylko do tych PE które mają VRF niebieski.
+No dobra, ale jak teraz zrobić, że jak np. CE::B3 rozgłosi swoją podsieć to żeby PE4 rozgłosiło to tylko do tych PE które mają VRF niebieski.
 
 ### Route Target
 
@@ -304,7 +304,7 @@ No i routery które nie mają odpalonego VRF blue to po prostu odrzucą to rozg�
 
 ### Route Distinguisher
 
-No dobra, ok ale np. taki PE3 jak dostanie rozgłoszenie, to od CE to skąd ma wiedzieć, który RT mu nadać? Ma podłączone dwa CE. Otóż tu kwestia ma się tak, że CE też umieją gadać tym MP-BGP i robimy też taki koncept jak to że ok, sieci klientów mogą używać tych samych przestrzeni adresowych. Ale my ISP, musimy mieć to unikalne.
+No dobra, ok ale np. taki PE3 jak dostanie rozgłoszenie, to od CE to skąd ma wiedzieć, który RT mu nadać? Ma podłączone dwa CE. Otóż tu kwestia ma się tak, że CE też umieją gadać tym MP-BGP i robimy też taki koncept jak to że ok, sieci klientów mogą używać tych samych przestrzeni adresowych ,ale my ISP, musimy mieć to unikalne.
 
 <img src="img\image-20230611202822856.png" alt="image-20230611202822856" style="zoom:67%;" />
 
@@ -338,11 +338,11 @@ Zarówno RT jak i RD konfiguruje się na ruterze (PE) wchodząc w VRF odpowiedni
 
 adres VPNv4 = RD + adres IP
 
-Jako RD często daje się numer AS ISPi jakiś nr sekwencyjny, który definiuje pojedynczy site klienta
+Jako RD często daje się numer AS ISP i jakiś nr sekwencyjny, który definiuje pojedynczy site klienta
 
 No i teraz jak sieć klienta w e-BGP rozgłosi jakąś sieć, to to w rzuterze PE trafi do VRF tego klienta (po jakim id to ja nie wiem, chyba na podstawie tego, że dany neighbor ma być obsługiwany przez dany VRF), który dalej (do MPLS core) rozgłosi ten adres, ale doczepi do niego RD na początek.
 
-Przykładowo AS 10 jest klientem routera PE2, który jest w AS 6000. To wtedy w VRF tego klienta (powiedzmy ze jest to VRF green) zapiszemy, że RD=`6000:10`, gdyż taka jest konwencja. Nasz AS a potem jakieś id sieć klienta.
+Przykładowo AS 10 jest klientem routera PE2, który jest w AS 6000. To wtedy w VRF tego klienta (powiedzmy ze jest to VRF green) zapiszemy, że RD=`6000:10`, gdyż taka jest konwencja. Nasz AS a potem jakieś id site'u klienta.
 
 ```
 PE2 > 
@@ -376,7 +376,7 @@ Oraz znamy też mechanizm, żeby już potem jak klienci coś wysyłają na rozg�
 
 Jest jeszcze jedna kwestia. Ruter PE1 rozgłosił w MPLS core i do innych PE prefix 192.168.1.1. Rozgłosił czyli powiedział "Jestem podłączony do sieci, która ma dostęp do prefixu 192.168.1.1, więc jak coś macie do niego, to via me". 
 
-No więc klient A z site'u 1 wysyła coś na adres 192.168.1.1 PE1 pakuje to w tunel MPLS i jest jazda. W ostatnim ruterze tunelu dochodzi do zdjęcia ostatniej etykiety MPLS i zostaje goły pakiet IP. Dostaje go PE2. Całe szczęście pakiet IP ma dst_addr więc zrutujemy go no właśnie, gdzie? Przecież klient jest totalnie nieświadomy takich rzeczy jak ten cały VPRN, MPLS a w szczególności RD. Dla niego ta nasza cała zabawa to kabel, który łączy jego dwa LANy za pomocą e-BGP. Klient wysyła nam goły pakiet IT z dst_addr bez RD. 
+No więc klient A z site'u 1 wysyła coś na adres 192.168.1.1 PE1 pakuje to w tunel MPLS i jest jazda. W ostatnim ruterze tunelu dochodzi do zdjęcia ostatniej etykiety MPLS i zostaje goły pakiet IP. Dostaje go PE2. Całe szczęście pakiet IP ma dst_addr więc zrutujemy go no właśnie, gdzie? Przecież klient jest totalnie nieświadomy takich rzeczy jak ten cały VPRN, MPLS a w szczególności RD. Dla niego ta nasza cała zabawa to kabel, który łączy jego dwa LANy za pomocą e-BGP. Klient wysyła nam goły pakiet IT z dst_addr bez RD. Dlatego góły pakiet IP klienta zawiera adres wewnętrzny, który może się pokrywać z przestrzenią adresową innego klienta. Nie ma tam RD, bo klient nie wie co to RD.
 
 <img src="img\image-20230612184152670.png" alt="image-20230612184152670" style="zoom: 67%;" />
 
@@ -386,7 +386,7 @@ Jak możemy wykminić, żeby jednak powiązać ten pakiet z danym VPNem klienta.
 
 ![image-20230612184612666](img\image-20230612184612666.png)
 
-Czyli razem z parametrem RT, rozgłaszamy label. Mówimy "Jak coś to via me dostępny jest 198.3.97.0/24, jak będzie mieć do niego jakiś pakiet IP to wsadzając go w tunel dajcie na samym dole etykietę 17, to ja sobie zapisze  jak dostanę pakiet MPLS z ostatnią etykietą 17, to  to kierować do klienta co ma RT `blue-intranet`".
+Czyli razem z parametrem RT, rozgłaszamy label. Mówimy "Jak coś to via me dostępny jest 198.3.97.0/24, jak będzie mieć do niego jakiś pakiet IP to wsadzając go w tunel dajcie na samym dole etykietę 17, to ja sobie zapisze że  jak dostanę pakiet MPLS z ostatnią etykietą 17, to  to kierować do klienta co ma RT `blue-intranet`".
 
 ## Wielki przykład
 
@@ -523,7 +523,7 @@ Ta architektura jest **zoptymalizowana dla ruchu N-S** (North-South). Kiedyś w 
 
 Separacja aplikacji w warstwie **edge** jest robiona poprzez VLAN.
 
-> VLAN - any broadcast domain that is partitioned and isolated in a computer network at the data link layer (OSI layer 2), czyli jest to mechanizm protokołu ETH.
+> VLAN - any broadcast domain that is partitioned and isolated in a computer network at the data link layer (OSI layer 2), czyli jest to mechanizm protokołu ETH. Zaimplementowane poprzez VLAN Tag.
 
 Ogólnie każdy węzęł warstwy N, jest połączony z każdym węzłem warstwy N+1, który się nim opiekuje. Jak uniknięto pętli rutingowych? Zastosowano STP.
 
@@ -571,9 +571,9 @@ VPRN to było tak, że łączyliśmy kilka site'ów klienta i oni wysyłali do s
 
 **Any** **Transport Over MPLS (AToM)** *transports layer 2 frames like Ethernet or Frame-Relay over the MPLS Backbone*.
 
-AToM jest uznawany za usgłuę point-to-point typu VPWS (Virtual Private Wire Service) lub inaczej tzw. PW (Private Wire). Obie te nazwą mówią o tym, że klient od ISP dostaje swój prywatny wire (kabel), ale ISP robi go virtual bo tak naprawdę jest oparty na MPLS backbone.
+AToM jest uznawany za usgłuę point-to-point typu **VPWS (Virtual Private Wire Service)** lub inaczej tzw. **PW (Private Wire)**. Obie te nazwą mówią o tym, że klient od ISP dostaje swój prywatny wire (kabel), ale ISP robi go virtual bo tak naprawdę jest oparty na MPLS backbone.
 
-Ta technologia zastąpiła kopanie kabli pomiędzy siteami klientów. VPRN nic nie zastąpił, tylko zapronował klientom prywatne tunele w sieci.
+Ta technologia zastąpiła kopanie kabli pomiędzy siteami klientów. VPRN nic nie zastąpił, tylko zapronował klientom prywatne tunele w sieci ISP.
 
 <img src="img\image-20230613202228152.png" alt="image-20230613202228152" style="zoom:67%;" />
 
@@ -585,19 +585,19 @@ Terminologia architektury:
 - PW - Private Wire
 - LSP - MPLS::LabelSwitchedPath
 - Pseudowire to jest usługa, zaimplementowana jako LSP
-- Usługa ("L2 over L3") no tak naprawdę od strony klienta to już to co wysyła CE to jest usługa, bo wysyła on ramke ETH.
+- Usługa ("L2 over L3") - no tak naprawdę  od strony klienta to już to co wysyła CE to jest usługa, bo wysyła on ramke ETH.
 
 ## AToM
 
 No i to jest tak, ze jak przchodzi klient i mówi, że chce mieć PW między CE_green_1 a CE_green_2. To operator ISP konfiguruje mu ten ten PW o tak, że:
 
-- na routerach PE robią powiązanie `VC <-> AC` czyli wiąże Virtual Circuit (to jest PW klienta w MPLS core) z Access Circuit - łączem z klientem którego jest to PW
+- na routerach PE robi powiązanie `VC <-> AC` czyli wiąże Virtual Circuit (to jest PW klienta w MPLS core) z Access Circuit - łączem z klientem którego jest to PW
 
 ![image-20230613204248560](img\image-20230613204248560.png)
 
 Czyli od klienta przchodzi ramka ETHERNET (Layer-2 PDU). Router PE wie, którym AC to przyszło, więc wie który VC jest tego klienta. Tworzy więc pakiet MPLS, na dół daje etykietę o numerze VC, a na górze daje etykietę powiązaną z adresem loopback egress routera PE (drugiego gdzie jest AC tego klienta). Zna ten adres stąd, że routery PE są w sesji protokołu IGP.
 
-No i PE wysyła taki pakiet w MPLS Core. Ten Core sobie tę górną etykiete switchuje itp, ale tunele są tak skonfigorowane, że zacznając od TEJ etykiety, dojdziemy do TEGO routera.
+No i PE wysyła taki pakiet w MPLS Core. Ten Core sobie tę górną etykiete switchuje itp, ale tunele są tak skonfigorowane, że zacznając od TEJ etykiety od TEGO routera PE, dojdziemy do TEGO routera PE.
 
 Potem jak już router egress PE dostanie ten pakiet, to ma on tylko jedną etykietę. Zdejmuje ją, tam jest VC Label, patrzy na odwzorowanie `VC<->AC` i mówi "Acha ten PW jest tego klienta" i forwarduje na odpowiedni Access Circuit.
 
@@ -611,9 +611,9 @@ No dobra, co klient daje jako ten Layer-2 PDU? Otóż ramki ETH, teraz trochę o
 
 ## QinQ
 
-No dobra, jak klient wsadza do nas pakiety ETH, to bardzo możliwe, że ma on porobione w tej swojej dużej sieci ETHERNeT LAN porobione VLANy ETH. 
+No dobra, jak klient wsadza do nas pakiety ETH, to bardzo możliwe, że ma on porobione w tej swojej dużej sieci ETHERNET LAN porobione VLANy ETH. 
 
-Mechanizm VLAN ETH polega na tym, że ramka ETH ma dodatkowe pole określające do którego VLAN należy. 
+Mechanizm VLAN ETH polega na tym, że ramka ETH ma dodatkowe pole określające do którego VLAN należy (to pole to VLAN Tag).
 
 > **Mechanizm VLAN**
 >
@@ -651,13 +651,15 @@ To co stworzyliśmy poprzez stworzenie wielu VPWS/PW (Virtual Private Wire Servi
 
 # VxLAN
 
+VPLS jest do łączenia site'ów, VxLAN do chmury. LAN SERVICE - usługą jest sieć LAN; x - extensible
+
 **Virtual Extensible LAN (VXLAN)** is a network virtualization technology that <u>attempts to address the scalability problems associated with large cloud computing deployments</u>. It uses a VLAN-like encapsulation technique to **encapsulate OSI layer 2 Ethernet frames within layer 4 UDP datagrams**,] VXLAN endpoints, which terminate VXLAN tunnels and may be either virtual or physical switch ports, are known as **VXLAN tunnel endpoints** (VTEPs).
 
 VXLAN is an evolution of efforts to standardize on an overlay encapsulation protocol. Compared to VLAN (czyli po prostu te tagi) which provides limited number of layer-2 VLANs (typically using 12-bit VLAN ID), VXLAN increases scalability up to 16 million logical networks (with 24-bit VNID) and allows for layer-2 adjacency across IP networks.
 
 
 
-VPLS jest chyba słabo nadający się do Data Center, więc w DC używa się VxLAN.
+VLAN jest chyba słabo nadający się do Data Center, więc w DC używa się VxLAN.
 
 ![image-20230613225511997](img\image-20230613225511997.png)
 
@@ -732,7 +734,7 @@ Jak znasz adres docelowy  i chesz wysłać tylko do jednego hosta to wysyłasz r
 
 In contrary to unicast jest broadcast - wysłanie do wszystkich w sieci np. ARP "Who has 10.0.34.43?"
 
-Albo Multicast - czyli do kilku zdefiniowanych. Albo Unknown Multicast. 
+Albo Multicast - czyli do kilku zdefiniowanych. Albo Unknown Multicast - czyli nie wiem co, ale nie musze wiedzieć
 
 No to właśnie takie ramki z wieloma nadawami nazywamy **BUM (Broadcast, Unknown unicast, Multicast)**
 
