@@ -379,6 +379,8 @@ Więc ISP sobie sam wymyśla je, ale mamy:
 
 # VPRN
 
+#VPRN, #Layer 3 VPN, #RT, #RD, #MP-BGL #VPN Label #as_override, #allowas
+
 Virtual Private Routed Network to coś innego niż VPN. 
 
 Routed - oznacza że na niższej warstwie niż tunele tworzące tę sieć prywatną jest rutowanie normalnie. 
@@ -733,6 +735,8 @@ Dodatkowo IP fabric też:
 
 # VPLS
 
+#PW, #AToM #AC, #VC Label, #QinQ, 
+
 VPRN to było tak, że łączyliśmy kilka site'ów klienta i oni wysyłali do siebie ruch IP. Teraz opowiemy o tym jak site'y klienta mogą się wymieniać ruchem Ethernet.
 
 **Any** **Transport Over MPLS (AToM)** *transports layer 2 frames like Ethernet or Frame-Relay over the MPLS Backbone*.
@@ -816,6 +820,8 @@ To co stworzyliśmy poprzez stworzenie wielu VPWS/PW (Virtual Private Wire Servi
 <img src="img\image-20230613222848077.png" alt="image-20230613222848077" style="zoom:67%;" />
 
 # VxLAN
+
+#VxLAN, #Data Centers, #VTEP, #L2 overlay, #VNI ID
 
 VPLS jest do łączenia site'ów, VxLAN do chmury. LAN SERVICE - usługą jest sieć LAN; x - extensible
 
